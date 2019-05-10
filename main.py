@@ -6,9 +6,9 @@ def get_bidiagonal(size, random=True):
   np.random.seed(0)
 
   if random:
-    M = np.random.rand(size, size)
+    M = np.random.rand(size, size, dtype='float')
   else:
-    M = np.arange(1, size*size + 1).reshape((size, size))
+    M = np.arange(1, size*size + 1, dtype='float').reshape((size, size))
 
   for i in range(0, size):
     for j in range(0, size):
@@ -69,31 +69,35 @@ def givens_rotation_matrix_entries(a, b):
   return np.array([c, s, -s, c]).reshape((2,2))
 
 A = get_bidiagonal(5, random=False)
-print('A',A)
-T = get_T_matrix(A)
-print('T',T)
-shift = get_closest_eigenvalue(T)
-print('shift', shift)
-x = np.array([A[0,0]**2-shift, A[0,0] * A[0,1]])
-print('x', x)
-rot = givens_rotation_matrix_entries(x[0], x[1])
-print('rot', rot)
+print('numpy impl')
+print(np.linalg.svd(A, full_matrices=True)[1])
 
-size = 5
-for i in range(size-1):
-  c = A[i:i+2, i:i+2]
-  c = rot.dot(c)
-  print(c)
-  c = c.dot(rot.T)
-  print(c)
-  A[i:i+2, i:i+2] = c
+for iteration in range(10000):
+  # print(A)
+  T = get_T_matrix(A)
+  # print('T',T)
+  shift = get_closest_eigenvalue(T)
+  # print('shift', shift)
+  x = np.array([A[0,0]**2-shift, A[0,0] * A[0,1]])
+  # print('x', x)
+  rot = givens_rotation_matrix_entries(x[0], x[1])
+  # print('rot', rot)
 
-print('dot', rot.dot(x))
+  size = 5
+  for i in range(size-1):
+    c = A[i:i+2, i:i+2]
+    c = rot.dot(c)
+    # print(c)
+    c = c.dot(rot.T)
+    # print(c)
+    cc = np.array(c)
+    A[i:i+2, i:i+2] = c
+
 
 # T = A[3:4][3:4]
 # T = A[np.ix_([3,4],[3,4])]
 
-# print(T)
+print(A)
 
 # print(np.linalg.eig(T))
 
