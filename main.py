@@ -83,29 +83,49 @@ print(np.linalg.svd(A, full_matrices=True)[1])
 print('original')
 print(A)
 
-for iteration in range(10000):
+for iteration in range(100000):
   # print(A)
   T = get_T_matrix(A)
   # print('T',T)
   shift = get_closest_eigenvalue(T)
+  yy = T[0,0] - shift
+  zz = T[0,1]
   # print('shift', shift)
   # print('x', x)
   # print('rot', rot)
 
   size = 5
   for i in range(size-1):
-    x = np.array([A[i,i]**2-shift, A[i,i] * A[i,i+1]])
-    rot = givens_rotation_matrix_entries(x[0], x[1])
+    # x = np.array([A[i,i]**2-shift, A[i,i] * A[i,i+1]])
+    rot = givens_rotation_matrix_entries(yy, zz)
 
-    (c, s) = get_rot(x[0], x[1])
+    (c, s) = get_rot(yy, zz)
     rot = np.array([[c,s], [-s, c]])
 
-    y = A[i:i+2, i:i+2]
+    y = A[:, i:i+2]
     y = y.dot(rot)
+    A[:, i:i+2] = y
+
+    # second part
+
+    yy = A[i,i]
+    zz = A[i+1, i]
+
+    rot = givens_rotation_matrix_entries(yy, zz)
+
+    (c, s) = get_rot(yy, zz)
+    rot = np.array([[c,s], [-s, c]])
+
     # print(y)
+    y = A[i:i+2, :]
     y = rot.T.dot(y)
+    A[i:i+2, :] = y
+
+    if i < size-2:
+      yy=A[i,i+1]
+      zz=A[i,i+2]
     # print(y)
-    A[i:i+2, i:i+2] = y
+    # A[i:i+2, i:i+2] = y
     # print(A)
 
 
