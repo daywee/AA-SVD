@@ -83,7 +83,7 @@ print(np.linalg.svd(A, full_matrices=True)[1])
 print('original')
 print(A)
 
-for iteration in range(100000):
+for iteration in range(10000):
   # print(A)
   T = get_T_matrix(A)
   # print('T',T)
@@ -93,6 +93,9 @@ for iteration in range(100000):
   # print('shift', shift)
   # print('x', x)
   # print('rot', rot)
+
+  U = None
+  V = None
 
   size = 5
   for i in range(size-1):
@@ -105,6 +108,14 @@ for iteration in range(100000):
     y = A[:, i:i+2]
     y = y.dot(rot)
     A[:, i:i+2] = y
+
+    e = np.eye(size, dtype='float')
+    e[i:i+2,i:i+2] = rot
+
+    if U is None:
+      U = e
+    else:
+      U = U.dot(e)
 
     # second part
 
@@ -121,6 +132,14 @@ for iteration in range(100000):
     y = rot.T.dot(y)
     A[i:i+2, :] = y
 
+    e = np.eye(size, dtype='float')
+    e[i:i+2,i:i+2] = rot.T
+
+    if V is None:
+      V = e
+    else:
+      V = e.dot(V)
+
     if i < size-2:
       yy=A[i,i+1]
       zz=A[i,i+2]
@@ -135,4 +154,10 @@ for iteration in range(100000):
 print(A)
 
 # print(np.linalg.eig(T))
+
+print('results===============')
+print(U.dot(A).dot(V.T))
+print(U.T.dot(A).dot(V))
+print(V.dot(A).dot(U.T))
+print(V.T.dot(A).dot(U))
 
