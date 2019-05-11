@@ -1,12 +1,14 @@
 import numpy as np
 from math import hypot
 
+np.set_printoptions(linewidth=200)
+np.set_printoptions(precision=3)
 
 def get_bidiagonal(size, random=True):
   np.random.seed(0)
 
   if random:
-    M = np.random.rand(size, size, dtype='float')
+    M = np.random.rand(size, size)
   else:
     M = np.arange(1, size*size + 1, dtype='float').reshape((size, size))
 
@@ -79,11 +81,19 @@ def givens_rotation_matrix_entries(a, b):
 
 A = get_bidiagonal(5, random=False)
 print('numpy impl')
-print(np.linalg.svd(A, full_matrices=True)[1])
+npsvd = np.linalg.svd(A, full_matrices=True)
+print('numpy reconstruction')
+xxxxxx = npsvd[0][:,:5]
+# print(xxxxxx)
+# print(npsvd[0])
+print(np.dot(npsvd[0] * npsvd[1], npsvd[2]))
+
+# print(npsvd[0].dot(eyes.dot(npsvd[2].T)))
+
 print('original')
 print(A)
 
-for iteration in range(10000):
+for iteration in range(1000):
   # print(A)
   T = get_T_matrix(A)
   # print('T',T)
@@ -108,6 +118,7 @@ for iteration in range(10000):
     y = A[:, i:i+2]
     y = y.dot(rot)
     A[:, i:i+2] = y
+    print(A)
 
     e = np.eye(size, dtype='float')
     e[i:i+2,i:i+2] = rot
@@ -131,6 +142,7 @@ for iteration in range(10000):
     y = A[i:i+2, :]
     y = rot.T.dot(y)
     A[i:i+2, :] = y
+    print(A)
 
     e = np.eye(size, dtype='float')
     e[i:i+2,i:i+2] = rot.T
@@ -151,13 +163,30 @@ for iteration in range(10000):
 # T = A[3:4][3:4]
 # T = A[np.ix_([3,4],[3,4])]
 
+s = ''
+for i in range(size):
+  s += str(A[i,i])
+  s += ','
+print('my values:')
+print(s)
+
 print(A)
 
 # print(np.linalg.eig(T))
 
 print('results===============')
+sings = []
+for i in range(size):
+  sings.append(A[i,i])
+sings = np.array(sings)
+
 print(U.dot(A).dot(V.T))
 print(U.T.dot(A).dot(V))
 print(V.dot(A).dot(U.T))
 print(V.T.dot(A).dot(U))
+
+# print(np.dot(U * sings, V.T))
+# print(np.dot(U.T * sings, V))
+# print(np.dot(V * sings, U.T))
+# print(np.dot(V.T * sings, U))
 
