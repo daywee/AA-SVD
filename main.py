@@ -1,11 +1,13 @@
 import numpy as np
-from math import hypot
+from math import hypot, sqrt
 
 np.set_printoptions(linewidth=200)
 np.set_printoptions(precision=3)
 
 def get_bidiagonal(size, random=True):
   np.random.seed(0)
+
+  return np.array([0.,1.,1.,sqrt(2),2.,0.,0.,1.,1.]).reshape((3,3))
 
   if random:
     M = np.random.rand(size, size)
@@ -49,6 +51,13 @@ def get_T_matrix(M):
 
   return T
 
+def get_T_matrix2(M):
+  (rows, cols) = M.shape
+  X = M.T.dot(M)
+  X = X[cols-2:cols:,cols-2:cols]
+
+  return X
+
 def get_closest_eigenvalue(T):
   lambdas = np.linalg.eig(T)[0]
   shift = get_closer_number(lambdas, T[0,0])
@@ -82,6 +91,7 @@ def givens_rotation_matrix_entries(a, b):
 A = get_bidiagonal(5, random=False)
 print('numpy impl')
 npsvd = np.linalg.svd(A, full_matrices=True)
+print(npsvd[1])
 print('numpy reconstruction')
 xxxxxx = npsvd[0][:,:5]
 # print(xxxxxx)
@@ -95,7 +105,8 @@ print(A)
 
 for iteration in range(1000):
   # print(A)
-  T = get_T_matrix(A)
+  T = get_T_matrix2(A)
+  tt = get_T_matrix(A)
   # print('T',T)
   shift = get_closest_eigenvalue(T)
   yy = T[0,0] - shift
@@ -109,16 +120,15 @@ for iteration in range(1000):
 
   size = 5
   for i in range(size-1):
-    # x = np.array([A[i,i]**2-shift, A[i,i] * A[i,i+1]])
     rot = givens_rotation_matrix_entries(yy, zz)
 
     (c, s) = get_rot(yy, zz)
     rot = np.array([[c,s], [-s, c]])
 
-    y = A[:, i:i+2]
+    y = A[:,i:i+2]
     y = y.dot(rot)
-    A[:, i:i+2] = y
-    print(A)
+    A[:,i:i+2] = y
+    # print(A)
 
     e = np.eye(size, dtype='float')
     e[i:i+2,i:i+2] = rot
@@ -139,10 +149,10 @@ for iteration in range(1000):
     rot = np.array([[c,s], [-s, c]])
 
     # print(y)
-    y = A[i:i+2, :]
+    y = A[i:i+2,:]
     y = rot.T.dot(y)
-    A[i:i+2, :] = y
-    print(A)
+    A[i:i+2,:] = y
+    # print(A)
 
     e = np.eye(size, dtype='float')
     e[i:i+2,i:i+2] = rot.T
@@ -152,12 +162,9 @@ for iteration in range(1000):
     else:
       V = e.dot(V)
 
-    if i < size-2:
+    if i < size-1:
       yy=A[i,i+1]
       zz=A[i,i+2]
-    # print(y)
-    # A[i:i+2, i:i+2] = y
-    # print(A)
 
 
 # T = A[3:4][3:4]
