@@ -121,9 +121,8 @@ def svd(M, epsilon, max_iterations=10000):
   V = np.identity(n)
 
   q = 0
-  # todo: rewrite to q < n
   iteration = 0
-  while q != n and iteration < max_iterations:
+  while q < n and iteration < max_iterations:
     iteration += 1
     q = find_q(B, epsilon)
     p = find_p(B, q, epsilon)
