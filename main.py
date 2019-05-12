@@ -7,7 +7,7 @@ np.set_printoptions(precision=3)
 def get_bidiagonal(size, random=True):
   np.random.seed(0)
 
-  return np.array([0.,1.,1.,sqrt(2),2.,0.,0.,1.,1.]).reshape((3,3))
+  # return np.array([0.,1.,1.,sqrt(2),2.,0.,0.,1.,1.]).reshape((3,3))
 
   if random:
     M = np.random.rand(size, size)
@@ -164,7 +164,10 @@ for iteration in range(1000):
 
     if i < size-1:
       yy=A[i,i+1]
-      zz=A[i,i+2]
+      if i == size-2:
+        zz = 0.0
+      else:
+        zz=A[i,i+2]
 
 
 # T = A[3:4][3:4]
@@ -187,10 +190,10 @@ for i in range(size):
   sings.append(A[i,i])
 sings = np.array(sings)
 
-print(U.dot(A).dot(V.T))
-print(U.T.dot(A).dot(V))
-print(V.dot(A).dot(U.T))
-print(V.T.dot(A).dot(U))
+print(U.dot(A).dot(V))
+print(U.T.dot(A).dot(V.T))
+print(V.dot(A).dot(U))
+print(V.T.dot(A).dot(U.T))
 
 # print(np.dot(U * sings, V.T))
 # print(np.dot(U.T * sings, V))
