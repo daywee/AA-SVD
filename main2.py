@@ -19,6 +19,10 @@ def get_bidiagonal(size, random=True):
       if (i != j and i + 1 != j):
         M[i][j] = 0
 
+  M[0,0] = -1
+  M[3,4] = -20
+  M[4,4] = -25
+
   return M
 
 def find_q(B, epsilon):
@@ -76,7 +80,7 @@ def svd_internal(B):
   T_trailing = T[m - 2:m,n - 2:n]
 
   eigenvalues = np.linalg.eig(T_trailing)[0]
-  shift = get_closer_number(eigenvalues, T[1, 1])
+  shift = get_closer_number(eigenvalues, T_trailing[1, 1])
 
   y = T[0, 0] - shift
   z = T[0, 1]
@@ -90,9 +94,9 @@ def svd_internal(B):
     x = x.dot(rotation_matrix)
     B[:, k:k + 2] = x
 
-    U_rotation_matrix = np.identity(n)
-    U_rotation_matrix[k:k + 2, k:k + 2] = rotation_matrix
-    U = U.dot(U_rotation_matrix)
+    V_rotation_matrix = np.identity(n)
+    V_rotation_matrix[k:k + 2, k:k + 2] = rotation_matrix
+    V = V.dot(V_rotation_matrix)
 
     y = B[k, k]
     z = B[k + 1, k]
@@ -103,9 +107,9 @@ def svd_internal(B):
     x = rotation_matrix.dot(x)
     B[k:k + 2, :] = x
 
-    V_rotation_matrix = np.identity(m)
-    V_rotation_matrix[k:k + 2, k:k + 2] = rotation_matrix
-    V = V_rotation_matrix.dot(V)
+    U_rotation_matrix = np.identity(m)
+    U_rotation_matrix[k:k + 2, k:k + 2] = rotation_matrix
+    U = U_rotation_matrix.dot(U)
 
     if (k < n - 1):
       y = B[k, k + 1]
@@ -134,15 +138,24 @@ def svd(B, epsilon, max_iterations=10000):
       (u, S, v) = svd_internal(b22)
 
       B[p:p + b22_size + 1, p:p + b22_size + 1] = S
+      print('b22')
+      print(S)
 
       pu = np.identity(b22_size + p + q)
       pu[p:p + b22_size + 1, p:p + b22_size + 1] = u
 
+
       pv = np.identity(b22_size + p + q)
       pv[p:p + b22_size + 1, p:p + b22_size + 1] = v
 
-      U = U.dot(pu)
-      V = pv.dot(V)
+      print('padded V')
+      print(pv)
+
+      print('padded U')
+      print(pu)
+
+      U = pu.dot(U)
+      V = V.dot(pv)
 
   return (U, B, V)
 
