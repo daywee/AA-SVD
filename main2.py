@@ -19,10 +19,6 @@ def get_bidiagonal(size, random=True):
       if (i != j and i + 1 != j):
         M[i][j] = 0
 
-  M[0,0] = -1
-  M[3,4] = -20
-  M[4,4] = -25
-
   return M
 
 def find_q(B, epsilon):
@@ -118,7 +114,8 @@ def svd_internal(B):
   return (U, B, V)
 
 
-def svd(B, epsilon, max_iterations=10000):
+def svd(M, epsilon, max_iterations=10000):
+  B = M.copy()
   (m, n) = B.shape
   U = np.identity(m)
   V = np.identity(n)
@@ -138,30 +135,24 @@ def svd(B, epsilon, max_iterations=10000):
       (u, S, v) = svd_internal(b22)
 
       B[p:p + b22_size + 1, p:p + b22_size + 1] = S
-      print('b22')
-      print(S)
 
       pu = np.identity(b22_size + p + q)
       pu[p:p + b22_size + 1, p:p + b22_size + 1] = u
 
-
       pv = np.identity(b22_size + p + q)
       pv[p:p + b22_size + 1, p:p + b22_size + 1] = v
-
-      print('padded V')
-      print(pv)
-
-      print('padded U')
-      print(pu)
 
       U = pu.dot(U)
       V = V.dot(pv)
 
-  return (U, B, V)
+  return (U.T, B, V)
 
 
 
 A = get_bidiagonal(5, random=False)
+print('original')
+print(A)
+
 s = np.linalg.svd(A, full_matrices=True)
 print('numpy svd:')
 print(s[1])
@@ -175,7 +166,5 @@ for i in range(S.shape[0]):
 print(s)
 
 print('results:')
-print(U.dot(A).dot(V.T))
-print(U.T.dot(A).dot(V))
-print(V.dot(A).dot(U.T))
-print(V.T.dot(A).dot(U))
+print(U.dot(S).dot(V.T))
+
