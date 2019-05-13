@@ -7,8 +7,6 @@ np.set_printoptions(precision=3)
 def get_bidiagonal(size, random=True):
   np.random.seed(0)
 
-  # return np.array([sqrt(2),-2.,0.,0,sqrt(2),-sqrt(2),0.,0.,0.]).reshape((3,3))
-
   if random:
     M = np.random.rand(size, size)
   else:
@@ -147,7 +145,6 @@ def svd(M, epsilon, max_iterations=10000):
   return (U.T, B, V)
 
 
-
 A = get_bidiagonal(5, random=False)
 print('original')
 print(A)
@@ -157,13 +154,11 @@ print('numpy svd:')
 print(s[1])
 (U, S, V) = svd(A, np.finfo(np.float).eps)
 
-print('my values:')
+print('computed singular values:')
 s = ''
 for i in range(S.shape[0]):
-  s += str(A[i,i])
-  s += ','
+  s += str(A[i,i]) + ','
 print(s)
 
-print('results:')
+print('reconstruction:')
 print(U.dot(S).dot(V.T))
-
