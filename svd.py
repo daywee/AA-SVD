@@ -19,6 +19,9 @@ def get_bidiagonal(size, random=True):
 
   return M
 
+def get_random_matrix(size):
+  return np.random.rand(size, size)
+
 def find_q(B, epsilon):
   (m, n) = B.shape
   q = 0
@@ -115,6 +118,10 @@ def svd_internal(B):
 def svd(M, epsilon, max_iterations=10000):
   B = M.copy()
   (m, n) = B.shape
+
+  if m != n:
+    raise Exception('Dimension must be the same')
+
   U = np.identity(m)
   V = np.identity(n)
 
@@ -144,21 +151,30 @@ def svd(M, epsilon, max_iterations=10000):
 
   return (U.T, B, V)
 
-
-A = get_bidiagonal(5, random=False)
+# A = np.array([[4, 3, 0, 2], [2, 1, 2, 1], [4, 4, 0, 3], [5, 6, 1, 3]], dtype='float64')
+# A = get_bidiagonal(100, random=True)
+A = get_random_matrix(100)
 print('original')
 print(A)
+print()
 
 s = np.linalg.svd(A, full_matrices=True)
 print('numpy svd:')
 print(s[1])
-(U, S, V) = svd(A, np.finfo(np.float).eps)
+print()
+(U, S, V) = svd(A, np.finfo(np.float).eps, 100)
 
 print('computed singular values:')
 s = ''
 for i in range(S.shape[0]):
-  s += str(A[i,i]) + ','
+  s += str(S[i,i]) + ', '
+s = s[:len(s)-2] # strip last comma
 print(s)
+print()
 
 print('reconstruction:')
-print(U.dot(S).dot(V.T))
+R = U.dot(S).dot(V.T)
+print(R, '\n')
+
+print('Reconstruction equals to original')
+print(np.allclose(A, R))
