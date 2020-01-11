@@ -64,9 +64,14 @@ def get_closer_number(numbers, number):
 def get_givens_rotation_matrix(a, b):
   """Compute matrix entries for Givens rotation."""
   """https://en.wikipedia.org/wiki/Givens_rotation"""
-  r = hypot(a, b)
-  c = a / r
-  s = -b / r
+  if b == 0.0:
+    c = 1.0
+    s = 0.0
+    r = a
+  else:
+    r = hypot(a, b)
+    c = a / r
+    s = -b / r
 
   return np.array([[c, s], [-s, c]])
 
